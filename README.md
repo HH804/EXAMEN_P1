@@ -11,4 +11,9 @@ Materiales:
 • Jumpers
 
 ```
+
+### CIRCUITO
 ![Evidencia.](https://github.com/HH804/EXAMEN_P1/blob/main/EVIDENCIA%201.jpeg)
+
+### DIAGRAMA
+![Evidencia.](https://github.com/HH804/EXAMEN_P1/blob/main/EVIDENCIA%202.jpeg)
