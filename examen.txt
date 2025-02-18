@@ -6,8 +6,9 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
 
-#define pin2 4  
-#define buzzerPin 5  
+#define pin2 4  // Pin del sensor DHT22
+#define bmpPin 5  // Pin del sensor BMP280
+#define buzzerPin 6  // Pin del buzzer (ajustado para no solaparse con sensores)
 #define TEMP_THRESHOLD 27.0  
 #define HUM_THRESHOLD 60.0   
 
@@ -37,19 +38,19 @@ void setup() {
   ThingSpeak.begin(client);  
   Serial.println("Test de sensores:");
   dht2.begin();
-   Wire.begin(21, 22);  
+  Wire.begin(21, 22);  
   if (!bme.begin(0x76)) {  
-    Serial.println(F("Error con BMP180"));
+    Serial.println(F("Error con BMP280"));
     while (1);  
   }
-  Serial.println(F("BMP180 verificado"));
+  Serial.println(F("BMP280 verificado"));
   pinMode(buzzerPin, OUTPUT);
   digitalWrite(buzzerPin, LOW);  
 }
 
 void loop() {
    leerdht2();
-  leerBMP180();
+  leerBMP280();
   delay(1000);
   if(WiFi.status() != WL_CONNECTED){
     Serial.print("Attempting to connect to SSID: ");
@@ -91,15 +92,14 @@ void leerdht2() {
   float t2 = dht2.readTemperature();
   float h2 = dht2.readHumidity();
 
-  
   while (isnan(t2) || isnan(h2)) {
     Serial.println("Verificando...");
     delay(2000);
     t2 = dht2.readTemperature();
     h2 = dht2.readHumidity();
   }
-  number1=dht2.readTemperature();
-  number2=dht2.readHumidity();
+  number1 = t2;
+  number2 = h2;
   Serial.print("Temperatura DHT22: ");
   Serial.print(t2);
   Serial.println(" ºC.");
@@ -109,7 +109,6 @@ void leerdht2() {
   Serial.println(" %.");
   Serial.println("-----------------------");
 
-  
   if (t2 > TEMP_THRESHOLD || h2 > HUM_THRESHOLD) {
     activarAlarma(); 
   } else {
@@ -117,30 +116,27 @@ void leerdht2() {
   }
 }
 
-
 void leerBMP280() {
-  Serial.print(F("Temperatura BMP180: "));
+  Serial.print(F("Temperatura BMP280: "));
   Serial.print(bme.readTemperature());
   Serial.println(F(" °C"));
 
-  Serial.print(F("Presión BMP180: "));
+  Serial.print(F("Presión BMP280: "));
   Serial.print(bme.readPressure() / 100.0F); 
-  number3=bme.readPressure() / 100.0F;
+  number3 = bme.readPressure() / 100.0F;
   Serial.println(F(" hPa"));
 
-  Serial.print(F("Altitud BMP180: "));
+  Serial.print(F("Altitud BMP280: "));
   Serial.print(bme.readAltitude(1013.25));  
   Serial.println(F(" metros"));
 
   Serial.println("-----------------------");
 }
 
-
 void activarAlarma() {
   Serial.println("Fuera de rango");
   digitalWrite(buzzerPin, HIGH);  
 }
-
 
 void detenerAlarma() {
   digitalWrite(buzzerPin, LOW);  
